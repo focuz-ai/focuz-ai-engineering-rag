@@ -1,0 +1,51 @@
+# Retrieval híbrido con aislamiento y vigencia
+
+Autor: [Focuz](https://www.focuz.io/). Caso de las sesiones 06 a 11.
+Python 3.11 o posterior; sin dependencias para el laboratorio local.
+
+```powershell
+python -m unittest discover -s tests -v
+python -m rag
+```
+
+La demo evalúa siete consultas sintéticas, seis con relevantes y una sin respuesta.
+Imprime evidencias y métricas; son pruebas de funcionamiento, no un benchmark de
+calidad empresarial ni una evaluación de un LLM. Los vectores son conteos manuales
+de cuatro grupos de palabras: NO son embeddings aprendidos ni búsqueda semántica
+general. BM25 y RRF se implementan para hacer visible el cálculo.
+
+## Flujo
+
+Identidad verificada en servidor → filtro tenant/roles/vigencia → BM25 y vector
+didáctico → RRF → evidencia → respuesta extractiva con ID fuente.
+La fecha final es exclusiva y la inicial inclusiva. Los documentos deben tener
+IDs únicos por versión. Los metadatos de permiso nunca se aceptan del LLM.
+
+## Laboratorio
+
+1. Añade diez documentos distractores y tres consultas sin respuesta.
+2. Demuestra que un usuario support no recibe A-admin-v1.
+3. Consulta antes y después del cambio de política y valida la cita.
+4. Sustituye el vector didáctico por un modelo de embeddings, conservando la interfaz.
+5. Lleva el índice a pgvector y mide recall del índice aproximado frente al exacto.
+6. Añade un cross encoder; evalúa si mejora nDCG con un coste aceptable.
+7. Añade generación con LLM solo después de aprobar recuperación y permisos.
+
+## Qué falta para producción
+
+No hay ingesta real, OCR, parser de PDF, base vectorial, RLS, autenticación de red,
+modelo de embeddings, reranker ni generador LLM. Los filtros en memoria enseñan el
+contrato de seguridad; no reemplazan RLS y políticas del servicio. Un documento con
+solo una palabra coincidente puede ser irrelevante: el score no es una probabilidad.
+Se necesita dataset independiente, threshold calibrado, citas por afirmación,
+reindexado atómico, borrado y pruebas de fuga. La pregunta no modifica permisos.
+
+## Fuentes
+
+https://github.com/pgvector/pgvector
+https://qdrant.tech/documentation/concepts/hybrid-queries/
+https://www.sbert.net/examples/cross_encoder/applications/README.html
+https://www.postgresql.org/docs/current/ddl-rowsecurity.html
+https://www.lidr.co/ai-engineering/ (secuencia curricular)
+
+Consulta: 28 de octubre de 2026. Véase NOTICE.md.
