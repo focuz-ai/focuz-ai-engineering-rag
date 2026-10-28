@@ -1,6 +1,6 @@
 import unittest
 from datetime import date
-from rag.core import Principal, Retriever, answer, recall_at_k, reciprocal_rank, cosine, Document
+from rag.core import Principal, Retriever, answer, recall_at_k, reciprocal_rank, cosine, Document, rrf
 from rag.data import DOCS, CASES
 
 class RAGTests(unittest.TestCase):
@@ -35,10 +35,25 @@ class RAGTests(unittest.TestCase):
         self.assertEqual(reciprocal_rank(['a','b'],['b']),0.5)
     def test_zero_cosine(self):
         self.assertEqual(cosine([0,0],[1,0]),0)
+    def test_cosine_dimensions_and_known_value(self):
+        for a,b in [([1],[1,10]),([1,10],[1]),([],[])]:
+            with self.subTest(a=a,b=b), self.assertRaises(ValueError):
+                cosine(a,b)
+        self.assertAlmostEqual(cosine([1,0],[0.8,0.6]),0.8)
+    def test_metric_k_validation(self):
+        for k in [-1,0,1.5,True]:
+            with self.subTest(metric='recall',k=k), self.assertRaises(ValueError):
+                recall_at_k(['a'],['a'],k)
+        for k in [-1,1.5,True]:
+            with self.subTest(metric='rrf',k=k), self.assertRaises(ValueError):
+                rrf([('a',1.0)],k=k)
+        self.assertEqual(rrf([('a',1.0)],k=0),[('a',1.0)])
     def test_bad_ids(self):
         with self.assertRaises(ValueError): Retriever([DOCS[0],DOCS[0]])
     def test_empty_and_bad_limit(self):
         self.assertEqual(self.r.search('',self.p,self.on),[])
-        with self.assertRaises(ValueError): self.r.search('soporte',self.p,self.on,0)
+        for limit in [0,-1,1.5,True]:
+            with self.subTest(limit=limit), self.assertRaises(ValueError):
+                self.r.search('soporte',self.p,self.on,limit)
 
 if __name__ == '__main__': unittest.main()

@@ -56,6 +56,9 @@ def concept_vector(text):
     words = set(tokens(text))
     return [float(len(words & concept)) for concept in CONCEPTS]
 def cosine(a,b):
+    if len(a) != len(b) or not a:
+        raise ValueError('Dimensiones incompatibles o vectores vacíos')
+    # El vector nulo significa que no se detectó ningún concepto en esta demo.
     denominator = sqrt(sum(x*x for x in a)*sum(y*y for y in b))
     return sum(x*y for x,y in zip(a,b))/denominator if denominator else 0.0
 def dense_demo(query, docs):
@@ -63,6 +66,8 @@ def dense_demo(query, docs):
     scores = [(d.id,cosine(q,concept_vector(d.text))) for d in docs]
     return sorted((x for x in scores if x[1] > 0), key=lambda x:(-x[1],x[0]))
 def rrf(*rankings, k=60):
+    if type(k) is not int or k < 0:
+        raise ValueError('k debe ser un entero no negativo')
     scores = {}
     for ranking in rankings:
         for rank, (doc_id, _) in enumerate(ranking,1):
@@ -75,7 +80,8 @@ class Retriever:
         if len({d.id for d in self.docs}) != len(self.docs):
             raise ValueError('ID de documento duplicado')
     def search(self, query, principal, on, limit=3):
-        if limit < 1: raise ValueError('limit debe ser positivo')
+        if type(limit) is not int or limit < 1:
+            raise ValueError('limit debe ser un entero positivo')
         if not tokens(query): return []
         # Filtrar antes del ranking y de calcular estadísticas del corpus.
         docs = [d for d in self.docs if visible(d,principal,on)]
@@ -92,6 +98,8 @@ def answer(query, principal, on, retriever):
     return {'text':doc.text, 'citations':[doc.id], 'abstained':False}
 
 def recall_at_k(ranked, relevant, k):
+    if type(k) is not int or k < 1:
+        raise ValueError('k debe ser un entero positivo')
     if not relevant: raise ValueError('Recall no definido sin relevantes')
     return len(set(ranked[:k]) & set(relevant))/len(set(relevant))
 def reciprocal_rank(ranked, relevant):

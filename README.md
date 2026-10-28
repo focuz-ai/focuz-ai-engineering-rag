@@ -13,6 +13,9 @@ Imprime evidencias y métricas; son pruebas de funcionamiento, no un benchmark d
 calidad empresarial ni una evaluación de un LLM. Los vectores son conteos manuales
 de cuatro grupos de palabras: NO son embeddings aprendidos ni búsqueda semántica
 general. BM25 y RRF se implementan para hacer visible el cálculo.
+El coseno rechaza dimensiones incompatibles y vectores vacíos. En esta demo un
+vector nulo significa ausencia de conceptos y recibe puntuación cero; no se
+interpreta como un coseno geométrico definido.
 
 ## Flujo
 
