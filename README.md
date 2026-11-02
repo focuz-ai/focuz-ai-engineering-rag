@@ -8,7 +8,7 @@ python -m unittest discover -s tests -v
 python -m rag
 ```
 
-La demo evalúa siete consultas sintéticas, seis con relevantes y una sin respuesta.
+La demo evalúa diez consultas sintéticas, nueve con relevantes y una sin respuesta.
 Imprime evidencias y métricas; son pruebas de funcionamiento, no un benchmark de
 calidad empresarial ni una evaluación de un LLM. Los vectores son conteos manuales
 de cuatro grupos de palabras: NO son embeddings aprendidos ni búsqueda semántica
@@ -23,6 +23,18 @@ Identidad verificada en servidor → filtro tenant/roles/vigencia → BM25 y vec
 didáctico → RRF → evidencia → respuesta extractiva con ID fuente.
 La fecha final es exclusiva y la inicial inclusiva. Los documentos deben tener
 IDs únicos por versión. Los metadatos de permiso nunca se aceptan del LLM.
+La tarifa de A es 30 unidades hasta el 31 de diciembre de 2026 y 40 desde el
+1 de enero de 2027. El `valid_to` exclusivo de la versión anterior coincide con
+el `valid_from` inclusivo de la nueva: nunca deben competir ambas en el ranking.
+Las consultas históricas siguen recuperando la versión aplicable a su fecha.
+
+## Corrección 1.0.1
+
+Se cerró la vigencia de `A-price-v1` en `2027-01-01` y se añadieron casos de
+regresión antes, en y después de la transición. Las pruebas comprueban tanto la
+única versión autorizada y vigente como la respuesta y su cita, incluida una
+consulta histórica después de una consulta actual. Es la corrección de TECH-01
+de la revisión adversarial; no modifica el algoritmo de ranking.
 
 ## Laboratorio
 

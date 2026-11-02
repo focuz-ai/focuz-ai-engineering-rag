@@ -1,6 +1,6 @@
 import unittest
 from datetime import date
-from rag.core import Principal, Retriever, answer, recall_at_k, reciprocal_rank, cosine, Document, rrf
+from rag.core import Principal, Retriever, answer, recall_at_k, reciprocal_rank, cosine, Document, rrf, visible
 from rag.data import DOCS, CASES
 
 class RAGTests(unittest.TestCase):
@@ -24,6 +24,27 @@ class RAGTests(unittest.TestCase):
         self.assertEqual(ranked[0].id,'A-hours-v2')
     def test_future_excluded(self):
         self.assertEqual(self.r.search('tarifa plan',self.p,self.on)[0].id,'A-price-v1')
+    def test_price_transition_before_on_and_after_effective_date(self):
+        for on, expected_id, price in [
+            (date(2026,12,31),'A-price-v1','30'),
+            (date(2027,1,1),'A-price-future','40'),
+            (date(2027,1,2),'A-price-future','40'),
+        ]:
+            with self.subTest(on=on):
+                # Metadata must leave exactly one applicable price, independently
+                # of the ranking or the wording that favored the old policy.
+                active = [d.id for d in DOCS if 'price' in d.id and visible(d,self.p,on)]
+                self.assertEqual(active,[expected_id])
+                result = answer('unidades mensuales',self.p,on,self.r)
+                self.assertEqual(result['citations'],[expected_id])
+                self.assertIn(price,result['text'])
+                self.assertFalse(result['abstained'])
+    def test_price_historical_query_after_current_query(self):
+        current = answer('tarifa plan',self.p,date(2027,1,2),self.r)
+        historical = answer('tarifa plan',self.p,date(2026,10,28),self.r)
+        self.assertEqual(current['citations'],['A-price-future'])
+        self.assertEqual(historical['citations'],['A-price-v1'])
+        self.assertIn('30',historical['text'])
     def test_unknown_abstains(self):
         self.assertTrue(answer('asteroide volcan',self.p,self.on,self.r)['abstained'])
     def test_evidence_exact(self):

@@ -7,8 +7,8 @@ DOCS = [
  Document('A-refund-v1','A','La devolución y reembolso se solicitan dentro de 7 días.',('support',),'2026-01-01'),
  Document('B-refund-v1','B','La devolución y reembolso se solicitan dentro de 15 días.',('support',),'2026-01-01'),
  Document('A-admin-v1','A','La clave de acceso ficticia administrativa es EJEMPLO-NO-SECRETO.',('admin',),'2026-01-01'),
- Document('A-price-v1','A','La tarifa del plan ficticio es 30 unidades mensuales.',('support',),'2026-01-01'),
- Document('A-price-future','A','La tarifa futura del plan ficticio será 40 unidades.',('support',),'2027-01-01'),
+ Document('A-price-v1','A','La tarifa del plan ficticio es 30 unidades mensuales.',('support',),'2026-01-01','2027-01-01'),
+ Document('A-price-future','A','La tarifa del plan ficticio es 40 unidades mensuales.',('support',),'2027-01-01'),
 ]
 
 CASES = [
@@ -19,4 +19,7 @@ CASES = [
  {'id':'q5','tenant':'A','query':'tarifa plan','expected':['A-price-v1'],'on':'2026-10-28'},
  {'id':'q6','tenant':'A','query':'horario soporte','expected':['A-hours-v1'],'on':'2025-10-28'},
  {'id':'q7','tenant':'A','query':'volcan asteroide','expected':[],'on':'2026-10-28'},
+ {'id':'q8','tenant':'A','query':'unidades mensuales','expected':['A-price-v1'],'on':'2026-12-31'},
+ {'id':'q9','tenant':'A','query':'unidades mensuales','expected':['A-price-future'],'on':'2027-01-01'},
+ {'id':'q10','tenant':'A','query':'unidades mensuales','expected':['A-price-future'],'on':'2027-01-02'},
 ]
