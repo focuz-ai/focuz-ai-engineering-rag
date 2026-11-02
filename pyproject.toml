@@ -4,11 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "focuz-rag-lab"
-version = "1.0.1"
+version = "1.1.0"
 description = "Recuperación híbrida didáctica con ACL, vigencia y evaluación"
 requires-python = ">=3.11"
 authors = [{name = "Focuz"}]
 dependencies = []
+
+[project.urls]
+Repository = "https://github.com/focuz-ai/focuz-ai-engineering-rag"
 
 [tool.setuptools.packages.find]
 include = ["rag*"]
